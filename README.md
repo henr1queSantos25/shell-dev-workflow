@@ -1,4 +1,4 @@
-# ZG Hero Project
+# Shell Dev Workflow
 
 > **Shell Dev Workflow** - Conjunto profissional de ferramentas de automação em Shell Script para padronizar e agilizar o fluxo de trabalho de desenvolvimento em ambientes Linux.
 
