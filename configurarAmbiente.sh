@@ -3,7 +3,6 @@
 echo "Iniciando configuração do ambiente ACZG-Hero..."
 
 # 1. Definir onde os scripts serão instalados
-# Usaremos uma pasta oculta na Home do usuário para ficar organizado
 INSTALL_DIR="$HOME/.aczg-hero"
 BIN_DIR="$INSTALL_DIR/bin"
 
@@ -14,7 +13,6 @@ if [ ! -d "$BIN_DIR" ]; then
 fi
 
 # 3. Copiar os scripts e dar permissão
-# Assume que os scripts estão na pasta ./scripts relativa a onde este instalador está
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS_SOURCE="$CURRENT_DIR/scripts"
 
@@ -28,24 +26,31 @@ else
     exit 1
 fi
 
-# 4. Configurar o Shell (.bashrc ou .zshrc)
-# Detecta qual arquivo de configuração o usuário usa
-SHELL_RC=""
-if [ -f "$HOME/.zshrc" ]; then
+# 4. Configurar o Shell
+# Detecta qual shell está rodando de verdade
+USER_SHELL=$(basename "$SHELL")
+
+if [ "$USER_SHELL" = "zsh" ]; then
     SHELL_RC="$HOME/.zshrc"
-elif [ -f "$HOME/.bashrc" ]; then
+elif [ "$USER_SHELL" = "bash" ]; then
     SHELL_RC="$HOME/.bashrc"
 else
-    # Fallback cria um .bashrc se nada existir
-    SHELL_RC="$HOME/.bashrc"
-    touch "$SHELL_RC"
+    # Fallback: tenta adivinhar se a detecção falhou
+    if [ -f "$HOME/.bashrc" ]; then
+        SHELL_RC="$HOME/.bashrc"
+    elif [ -f "$HOME/.zshrc" ]; then
+        SHELL_RC="$HOME/.zshrc"
+    else
+        SHELL_RC="$HOME/.bashrc"
+        touch "$SHELL_RC"
+    fi
 fi
 
-echo "Configurando arquivo de shell: $SHELL_RC"
+echo "Configurando arquivo de shell detectado: $SHELL_RC (Shell atual: $USER_SHELL)"
 
-# Verifica se já está instalado antes para não duplicar linhas
-if grep -q "# ACZG-HERO CONFIG" "$SHELL_RC"; then
-    echo " configuração já existe no $SHELL_RC. Pulando etapa de escrita."
+# Verifica se já instalamos antes para não duplicar linhas
+if grep -q "# ACZG-HERO CONFIG START" "$SHELL_RC"; then
+    echo "A configuração já existe no $SHELL_RC. Pulando etapa de escrita."
 else
     # Escreve as configurações no final do arquivo
     cat <<EOT >> "$SHELL_RC"
@@ -66,11 +71,10 @@ alias aczglog='tail -n 50 -f ~/aczg_ci.log'
 
 # --- ACZG-HERO CONFIG END ---
 EOT
-    echo "Aliases e PATH gravados com sucesso."
+    echo "Aliases e PATH gravados com sucesso em $SHELL_RC."
 fi
 
 echo ""
 echo "Instalação Concluída!"
-echo "MPORTANTE: Para usar os comandos agora, execute:"
+echo "IMPORTANTE: Para usar os comandos agora, execute:"
 echo "    source $SHELL_RC"
-echo "    (Ou feche e abra seu terminal novamente)"
