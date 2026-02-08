@@ -4,7 +4,8 @@
 # Padrão: Todo dia às 08:30
 
 PROJETO_DIR=$1
-SCRIPT_PATH="$(pwd)/scripts/aczg_daily_commit.sh"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_PATH="$SCRIPT_DIR/aczg_daily_commit.sh"
 
 if [ -z "$PROJETO_DIR" ]; then
     echo "Uso: aczg_schedule_commit <caminho_projeto>"

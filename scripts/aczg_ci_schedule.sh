@@ -11,7 +11,8 @@ if [ -z "$PROJETO_DIR" ]; then
     exit 1
 fi
 
-SCRIPT_PATH="$(pwd)/scripts/aczg_ci_logic.sh"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_PATH="$SCRIPT_DIR/aczg_ci_logic.sh"
 
 # Verifica se o script de lógica existe
 if [ ! -f "$SCRIPT_PATH" ]; then
